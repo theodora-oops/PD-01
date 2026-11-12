@@ -1,0 +1,129 @@
+{% from "_macros.html" import icon %}
+{% extends "app.html" %}
+{% set crumb = "Hasil analisis" %}
+{% set page_title = title %}
+{% set page_subtitle = "Hasil analisis kebutuhan sistem yang dihasilkan AI. Tinjau sebelum digunakan." %}
+{% block action %}
+<div class="flex shrink-0 gap-2">
+  <a class="secondary-button" href="{{ url_for('projects') }}">Semua proyek</a>
+  <button class="primary-button" id="print-report" type="button">
+    {{ icon("document", "size-5") }}
+    Unduh laporan
+  </button>
+</div>
+{% endblock %}
+{% block content %}
+<div class="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+  {% for value, label in [
+    (analysis.actors|length, "Aktor"),
+    (analysis.reqs|length, "Kebutuhan fungsional"),
+    (analysis.stories|length, "User stories"),
+    (analysis.score ~ "%", "Kelengkapan deskripsi"),
+  ] %}
+  <div class="rounded-2xl border border-line bg-white p-5 shadow-card">
+    <div class="text-3xl font-bold tracking-tight text-ink">{{ value }}</div>
+    <div class="mt-1 text-sm text-muted">{{ label }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+<section class="overflow-hidden rounded-3xl border border-line bg-white shadow-card">
+  <div class="flex gap-6 overflow-x-auto border-b border-line px-6 sm:px-8">
+    {% for name in ["Ringkasan", "Aktor", "Kebutuhan", "User stories", "Prioritas"] %}
+    <button class="tab-button shrink-0 {{ 'tab-active' if loop.first else '' }}" data-tab="{{ name }}" type="button" style="margin-left: 0">{{ name }}</button>
+    {% endfor %}
+  </div>
+
+  <div class="p-6 sm:p-8">
+    <div class="tab-panel space-y-6" data-panel="Ringkasan">
+      <p class="text-[15px] leading-7 text-ink">{{ analysis.summary }}</p>
+      <div>
+        <div class="mb-2 text-sm font-semibold text-ink">Sebaran prioritas</div>
+        <div class="flex h-3 overflow-hidden rounded-full bg-line">
+          <div class="bg-brand-dark" style="width: {{ shares.Tinggi }}%"></div>
+          <div class="bg-brand" style="width: {{ shares.Sedang }}%"></div>
+          <div class="bg-brand-soft" style="width: {{ shares.Rendah }}%"></div>
+        </div>
+        <div class="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-xs text-muted">
+          <span>Tinggi: {{ counts.Tinggi }}</span>
+          <span>Sedang: {{ counts.Sedang }}</span>
+          <span>Rendah: {{ counts.Rendah }}</span>
+        </div>
+      </div>
+      {% if analysis.notes %}
+      <div class="flex items-start gap-3 rounded-2xl border border-line bg-lilac/60 p-4 text-sm leading-6 text-ink">
+        {{ icon("sparkles", "mt-0.5 size-5 shrink-0 text-brand") }}
+        <ul class="space-y-1">
+          {% for note in analysis.notes %}<li>{{ note }}</li>{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+
+    <ul class="tab-panel hidden gap-4 sm:grid-cols-2" data-panel="Aktor">
+      {% for name, role, desc in analysis.actors %}
+      <li class="rounded-2xl border border-line p-5">
+        <div class="flex items-center gap-3">
+          <div class="flex size-10 items-center justify-center rounded-xl bg-lilac text-brand">{{ icon("user", "size-5") }}</div>
+          <div>
+            <div class="text-sm font-bold text-ink">{{ name }}</div>
+            <div class="text-xs text-muted">{{ role }}</div>
+          </div>
+        </div>
+        <p class="mt-3 text-sm leading-6 text-muted">{{ desc }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+
+    <div class="tab-panel hidden" data-panel="Kebutuhan">
+      <div class="mb-5 flex flex-wrap gap-2" id="req-filters">
+        {% for item in ["Semua", "Tinggi", "Sedang", "Rendah"] %}
+        <button class="req-chip rounded-full border px-4 py-2 text-xs font-semibold transition {{ 'border-brand bg-brand text-white' if loop.first else 'border-line bg-white text-muted hover:text-ink' }}" data-filter="{{ item }}" type="button">{{ item }}</button>
+        {% endfor %}
+      </div>
+      <p class="hidden py-6 text-center text-sm text-muted" id="req-empty">Tidak ada kebutuhan pada filter ini.</p>
+      <ul class="divide-y divide-line" id="req-list">
+        {% for id, text, actor, priority in analysis.reqs %}
+        <li class="req-item flex items-start gap-4 py-4" data-priority="{{ priority }}">
+          <span class="mt-0.5 w-14 shrink-0 text-xs font-bold text-brand">{{ id }}</span>
+          <div class="min-w-0 flex-1">
+            <div class="text-sm leading-6 text-ink">{{ text }}</div>
+            <div class="mt-1 text-xs text-muted">{{ actor }}</div>
+          </div>
+          <span class="shrink-0 rounded-full px-3 py-1 text-xs font-semibold {{ priority_style[priority] }}">{{ priority }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <ul class="tab-panel hidden space-y-3" data-panel="User stories">
+      {% for who, want, why in analysis.stories %}
+      <li class="rounded-2xl border border-line p-5 text-sm leading-7 text-ink">
+        Sebagai <strong class="text-brand-dark">{{ who }}</strong>, saya
+        ingin {{ want }} agar {{ why }}.
+      </li>
+      {% endfor %}
+    </ul>
+
+    <div class="tab-panel hidden gap-4 md:grid-cols-3" data-panel="Prioritas">
+      {% for label, color, items in analysis.features %}
+      <div class="rounded-2xl border border-line p-5">
+        <div class="flex items-center gap-2 text-sm font-bold text-ink">
+          <span class="size-2.5 rounded-full {{ color }}"></span>
+          {{ label }}
+        </div>
+        <ul class="mt-4 space-y-2">
+          {% for item in items %}
+          <li class="flex items-center gap-2 text-sm text-muted">
+            {{ icon("check", "size-4 text-success") }}
+            {{ item }}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/result.js') }}"></script>{% endblock %}

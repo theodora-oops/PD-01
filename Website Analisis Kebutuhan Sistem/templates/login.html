@@ -1,0 +1,82 @@
+{% from "_macros.html" import icon, brand %}
+{% extends "base.html" %}
+{% block title %}Masuk - SIKARA{% endblock %}
+{% block body %}
+<main class="min-h-screen bg-white lg:grid lg:grid-cols-[1.05fr_0.95fr]">
+  <section class="login-visual relative hidden min-h-screen overflow-hidden p-12 lg:flex lg:flex-col">
+    <div class="relative z-10">{{ brand(light=true) }}</div>
+
+    <div class="relative z-10 my-auto max-w-xl pb-8">
+      <div class="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white/90 backdrop-blur">
+        {{ icon("sparkles", "size-4") }}
+        Sistem Identifikasi Kebutuhan
+      </div>
+      <h1 class="text-5xl font-bold leading-[1.12] tracking-tight text-white">
+        Ubah ide menjadi
+        <br />
+        kebutuhan yang <span class="text-sky">terstruktur.</span>
+      </h1>
+      <p class="mt-6 max-w-lg text-lg leading-8 text-white/75">
+        Sistem Identifikasi Kebutuhan, Analisis, dan Rekomendasi Aplikasi
+        Penjaminan Mutu Polibatam: biarkan AI menganalisis dokumen dan
+        menyusun spesifikasi sistem dalam hitungan menit.
+      </p>
+    </div>
+
+    <div class="relative z-10 text-sm text-white/55">Unit Penjaminan Mutu Polibatam</div>
+    <div class="orb orb-one"></div>
+    <div class="orb orb-two"></div>
+    <div class="grid-decoration"></div>
+  </section>
+
+  <section class="flex min-h-screen items-center justify-center px-6 py-12 sm:px-12">
+    <div class="w-full max-w-md">
+      <div class="mb-12 lg:hidden">{{ brand() }}</div>
+      <div class="mb-9">
+        <div class="mb-3 text-sm font-semibold uppercase tracking-widest text-brand">Selamat datang kembali</div>
+        <h2 class="text-4xl font-bold tracking-tight text-ink">Masuk ke akun Anda</h2>
+        <p class="mt-3 text-base text-muted">Lanjutkan proyek analisis kebutuhan Anda.</p>
+      </div>
+
+      <form class="space-y-5" method="post" action="{{ url_for('login') }}">
+        <label class="block">
+          <span class="mb-2 block text-sm font-semibold text-ink">Nama Pengguna</span>
+          <span class="input-shell">
+            {{ icon("user", "size-5 text-muted") }}
+            <input class="w-full bg-transparent text-sm text-ink outline-none placeholder:text-subtle" type="text" name="username" value="{{ username }}" placeholder="nama_pengguna" required />
+          </span>
+        </label>
+
+        <label class="block">
+          <span class="mb-2 flex items-center justify-between text-sm font-semibold text-ink">
+            Kata sandi
+            <button class="text-xs font-semibold text-brand hover:text-brand-dark" type="button">Lupa kata sandi?</button>
+          </span>
+          <span class="input-shell">
+            {{ icon("lock", "size-5 text-muted") }}
+            <input id="password" class="w-full bg-transparent text-sm text-ink outline-none placeholder:text-subtle" type="password" name="password" autocomplete="current-password" placeholder="Masukkan kata sandi" required />
+            <button id="toggle-password" aria-label="Tampilkan kata sandi" class="text-muted transition hover:text-ink" type="button">
+              {{ icon("eye", "size-5") }}
+            </button>
+          </span>
+        </label>
+
+        <label class="flex cursor-pointer items-center gap-3 text-sm text-muted">
+          <input class="size-4 accent-brand" type="checkbox" name="remember" checked />
+          Ingat saya di perangkat ini
+        </label>
+
+        {% if error %}
+        <div class="text-sm font-medium text-red-600" role="alert">{{ error }}</div>
+        {% endif %}
+
+        <button class="primary-button group w-full" type="submit">
+          Masuk ke SIKARA
+          {{ icon("arrow", "size-5 transition-transform group-hover:translate-x-1") }}
+        </button>
+      </form>
+    </div>
+  </section>
+</main>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/login.js') }}"></script>{% endblock %}

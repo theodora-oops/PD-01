@@ -1,0 +1,30 @@
+{# Kartu bagian dengan judul (pengganti komponen Card) dan kolom isian (Field). #}
+{% macro card_open(title, desc=None) -%}
+<section class="overflow-hidden rounded-3xl border border-line bg-white shadow-card">
+  <div class="border-b border-line px-6 py-5">
+    <h2 class="text-base font-bold text-ink">{{ title }}</h2>
+    {% if desc %}<p class="mt-1 text-sm text-muted">{{ desc }}</p>{% endif %}
+  </div>
+  <div class="p-6">
+{%- endmacro %}
+
+{% macro card_close() -%}
+  </div>
+</section>
+{%- endmacro %}
+
+{% macro field(label, name, value="", type="text", disabled=false) -%}
+<label class="block">
+  <span class="mb-2 block text-sm font-semibold text-ink">{{ label }}</span>
+  <span class="input-shell {{ 'opacity-70' if disabled else '' }}">
+    <input class="w-full bg-transparent text-sm text-ink outline-none" name="{{ name }}" data-field="{{ name }}" type="{{ type }}" value="{{ value }}" {{ 'disabled' if disabled else '' }} />
+  </span>
+</label>
+{%- endmacro %}
+
+{% macro saved_notice(text, id) -%}
+<span class="hidden items-center gap-2 text-sm font-medium text-success" id="{{ id }}" role="status">
+  {% from "_macros.html" import icon %}{{ icon("check", "size-4") }}
+  {{ text }}
+</span>
+{%- endmacro %}

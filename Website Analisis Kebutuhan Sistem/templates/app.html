@@ -1,0 +1,120 @@
+{# Kerangka halaman setelah login: sidebar + topbar + judul halaman. #}
+{% from "_macros.html" import icon, brand %}
+{% extends "base.html" %}
+{% block title %}{{ crumb }} - SIKARA{% endblock %}
+{% block body %}
+{% set nav_items = [
+  ("grid", "Beranda", "dashboard", url_for("dashboard")),
+  ("plus", "Analisis baru", "workspace", url_for("workspace")),
+  ("folder", "Semua proyek", "projects", url_for("projects")),
+  ("clock", "Riwayat", "history", url_for("history")),
+] %}
+{# Daftar tautan dipakai dua kali: sidebar (layar >= 1024px) dan menu geser (layar < 1024px). #}
+{% macro nav_links(items, active_key) -%}
+<nav class="space-y-1">
+  {% for ic, label, key, href in items %}
+  <a class="nav-item w-full {{ 'nav-item-active' if key == active_key else '' }}" href="{{ href }}">
+    {{ icon(ic, "size-5") }}
+    {{ label }}
+  </a>
+  {% endfor %}
+</nav>
+{%- endmacro %}
+{% macro bottom_links(active_key) -%}
+<a class="nav-item w-full {{ 'nav-item-active' if active_key == 'help' else '' }}" href="{{ url_for('help_center') }}">
+  {{ icon("help", "size-5") }}
+  Pusat bantuan
+</a>
+<a class="nav-item w-full {{ 'nav-item-active' if active_key == 'settings' else '' }}" href="{{ url_for('settings') }}">
+  {{ icon("settings", "size-5") }}
+  Pengaturan
+</a>
+<a class="nav-item w-full" href="{{ url_for('logout') }}">
+  {{ icon("logout", "size-5") }}
+  Keluar
+</a>
+{%- endmacro %}
+
+<div class="flex min-h-screen bg-canvas">
+  <aside class="hidden w-64 shrink-0 border-r border-line bg-white p-5 lg:flex lg:flex-col">
+    <div class="px-2 pb-8 pt-2">{{ brand() }}</div>
+    <a class="primary-button mb-7 w-full" href="{{ url_for('workspace') }}">
+      {{ icon("plus", "size-5") }}
+      Analisis baru
+    </a>
+    {{ nav_links(nav_items, active) }}
+    <div class="mt-auto space-y-1 border-t border-line pt-5">
+      {{ bottom_links(active) }}
+    </div>
+  </aside>
+
+  <div class="min-w-0 flex-1">
+    <header class="flex h-20 items-center justify-between border-b border-line bg-white px-5 sm:px-8">
+      <div class="mnav-bar">
+        <button class="icon-button" id="nav-toggle" type="button" aria-label="Buka menu" aria-controls="mobile-nav" aria-expanded="false">
+          {{ icon("menu", "size-5") }}
+        </button>
+        {{ brand() }}
+      </div>
+      <div class="hidden items-center gap-2 text-sm text-muted lg:flex">
+        <span>Workspace</span>
+        {{ icon("chevron", "size-4") }}
+        <span class="font-semibold text-ink">{{ crumb }}</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <a class="icon-button" aria-label="Bantuan" href="{{ url_for('help_center') }}">
+          {{ icon("help", "size-5") }}
+        </a>
+        <div class="hidden h-7 w-px bg-line sm:block"></div>
+        <a class="flex items-center gap-3 rounded-xl p-1.5 transition hover:bg-canvas" href="{{ url_for('profile') }}">
+          <div class="flex size-9 items-center justify-center rounded-xl bg-lilac text-sm font-bold text-brand">{{ user.initials }}</div>
+          <div class="hidden text-left sm:block">
+            <div class="text-sm font-semibold text-ink">{{ user.short_name }}</div>
+            <div class="text-xs text-muted">{{ user.role }}</div>
+          </div>
+          {{ icon("chevron", "hidden size-4 rotate-90 text-muted sm:block") }}
+        </a>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-5xl px-5 py-10 sm:px-8 sm:py-14">
+      {% block header %}
+      <div class="mb-9 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+        <div>
+          <div class="mb-3 text-sm font-semibold uppercase tracking-widest text-brand">{{ crumb }}</div>
+          <h1 class="text-3xl font-bold tracking-tight text-ink sm:text-4xl">{{ page_title }}</h1>
+          <p class="mt-3 max-w-xl text-base leading-7 text-muted">{{ page_subtitle }}</p>
+        </div>
+        {% block action %}{% endblock %}
+      </div>
+      {% endblock %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+{# Menu geser (hanya tampil di layar < 1024px; dibuka tombol di header). Perilaku: static/js/nav.js #}
+<div class="mnav-overlay" id="nav-overlay"></div>
+<aside class="mnav-drawer" id="mobile-nav" aria-label="Menu utama" aria-hidden="true">
+  <div class="mnav-head">
+    {{ brand() }}
+    <button class="icon-button" id="nav-close" type="button" aria-label="Tutup menu">
+      {{ icon("close", "size-5") }}
+    </button>
+  </div>
+  <a class="mnav-user" href="{{ url_for('profile') }}">
+    <span class="mnav-avatar">{{ user.initials }}</span>
+    <span class="mnav-user-text">
+      <strong>{{ user.name }}</strong>
+      <span>{{ user.role }}</span>
+    </span>
+  </a>
+  <a class="primary-button w-full" href="{{ url_for('workspace') }}">
+    {{ icon("plus", "size-5") }}
+    Analisis baru
+  </a>
+  <div class="mnav-links">{{ nav_links(nav_items, active) }}</div>
+  <div class="mnav-foot">{{ bottom_links(active) }}</div>
+</aside>
+<script src="{{ url_for('static', filename='js/nav.js') }}" defer></script>
+{% endblock %}

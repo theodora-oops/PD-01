@@ -1,0 +1,17 @@
+# --- Inti aplikasi ---
+Flask>=3.0
+PyMySQL>=1.1
+python-dotenv>=1.0
+
+# --- Baca dokumen PDF / DOCX ---
+pypdf>=4.0
+python-docx>=1.1
+
+# --- NLP Bahasa Indonesia ---
+PySastrawi>=1.4          # stemming + stopword Indonesia (ringan)
+# sentence-transformers  # OPSIONAL: berat (~2 GB dengan torch), belum dipakai aplikasi
+
+# --- LLM ---
+google-genai             # Gemini (yang dipakai sekarang)
+# ollama                 # hanya bila memakai LLM lokal
+# anthropic              # hanya bila memakai Claude API

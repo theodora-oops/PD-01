@@ -1,0 +1,50 @@
+{% from "_macros.html" import icon %}
+{% extends "app.html" %}
+{% set crumb = "Semua proyek" %}
+{% set page_title = "Semua proyek" %}
+{% set page_subtitle = "Kelola seluruh proyek analisis kebutuhan sistem Anda." %}
+{% block action %}
+<a class="primary-button shrink-0" href="{{ url_for('workspace') }}">
+  {{ icon("plus", "size-5") }}
+  Analisis baru
+</a>
+{% endblock %}
+{% block content %}
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  <span class="input-shell sm:w-80">
+    {{ icon("search", "size-5 text-muted") }}
+    <input id="project-search" class="w-full bg-transparent text-sm text-ink outline-none placeholder:text-subtle" placeholder="Cari proyek..." />
+  </span>
+  <div class="flex flex-wrap gap-2" id="project-filters">
+    {% for item in ["Semua", "Selesai", "Diproses", "Draf"] %}
+    <button class="filter-chip rounded-full border px-4 py-2 text-xs font-semibold transition {{ 'border-brand bg-brand text-white' if loop.first else 'border-line bg-white text-muted hover:text-ink' }}" data-filter="{{ item }}" type="button">{{ item }}</button>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="hidden rounded-3xl border border-dashed border-line bg-white p-12 text-center text-sm text-muted" id="project-empty">
+  Tidak ada proyek yang cocok dengan pencarian Anda.
+</div>
+
+{% if not projects %}
+<div class="rounded-3xl border border-dashed border-line bg-white p-12 text-center text-sm text-muted">Belum ada proyek. Buat satu lewat <a class="font-semibold text-brand" href="{{ url_for('workspace') }}">Analisis baru</a>.</div>
+{% endif %}
+<div class="grid gap-4 md:grid-cols-2" id="project-grid">
+  {% for p in projects %}
+  {% set tag = "a" if p.status == "Selesai" else "article" %}
+  <{{ tag }} class="project-card group flex flex-col rounded-2xl border border-line bg-white p-6 shadow-card transition hover:-translate-y-0.5 hover:border-brand-soft" data-title="{{ p.title|lower }}" data-status="{{ p.status }}" {% if tag == "a" %}href="{{ url_for('result', proyek=p.id) }}"{% endif %}>
+    <div class="flex items-start justify-between gap-3">
+      <div class="flex size-10 items-center justify-center rounded-xl bg-lilac text-brand">{{ icon("folder", "size-5") }}</div>
+      <span class="rounded-full px-3 py-1 text-xs font-semibold {{ status_style[p.status] }}">{{ p.status }}</span>
+    </div>
+    <h3 class="mt-4 text-base font-bold text-ink">{{ p.title }}</h3>
+    <p class="mt-1.5 flex-1 text-sm leading-6 text-muted">{{ p.desc }}</p>
+    <div class="mt-5 flex items-center justify-between border-t border-line pt-4 text-xs text-muted">
+      <span>{{ p.source }} · {{ p.date }}</span>
+      <span class="font-semibold text-ink">{{ (p.reqs ~ " kebutuhan") if p.reqs > 0 else "Belum ada hasil" }}</span>
+    </div>
+  </{{ tag }}>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/projects.js') }}"></script>{% endblock %}

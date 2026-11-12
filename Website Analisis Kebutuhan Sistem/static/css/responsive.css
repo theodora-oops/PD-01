@@ -1,0 +1,303 @@
+/* =====================================================================
+   SIKARA - penyesuaian tampilan ponsel, tablet, dan desktop
+   ---------------------------------------------------------------------
+   File ini CSS biasa yang ditulis tangan. Bedanya dengan static/css/pages/*.css:
+   file di folder pages/ dibuat otomatis oleh Tailwind (npm run build:css) dan hanya
+   memuat class yang dipakai template. File ini TIDAK dibuat ulang oleh build tersebut,
+   jadi aman dari penimpaan. Dimuat paling akhir (lihat templates/base.html).
+
+   Titik patah (breakpoint) yang dipakai, sama dengan Tailwind:
+     ponsel   : lebar < 640px
+     tablet   : 640px - 1023px
+     desktop  : >= 1024px  (sidebar tetap tampil)
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   1. Teks panjang tanpa spasi (mis. nama berkas "Peminjaman_Fasilitas_..pdf")
+      tidak boleh melebarkan halaman. Anak elemen grid/flex secara bawaan tidak
+      mau menyempit di bawah lebar isinya; min-width: 0 mematikan perilaku itu.
+   --------------------------------------------------------------------- */
+main {
+  overflow-wrap: anywhere;
+}
+
+main .grid > *,
+main .flex > .min-w-0 {
+  min-width: 0;
+}
+
+/* ---------------------------------------------------------------------
+   2. Menu geser untuk tablet dan ponsel (sidebar disembunyikan di bawah 1024px).
+      Markup: templates/app.html. Perilaku buka/tutup: static/js/nav.js.
+   --------------------------------------------------------------------- */
+.mnav-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mnav-overlay,
+.mnav-drawer {
+  display: none; /* hanya dipakai di layar < 1024px, lihat blok media di bawah */
+}
+
+@media (max-width: 1023.98px) {
+  .mnav-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: block;
+    background: rgba(33, 28, 58, 0.45);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 200ms ease,
+      visibility 0s linear 200ms;
+  }
+
+  .mnav-drawer {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: min(84vw, 20rem);
+    padding: 20px;
+    padding-top: max(20px, env(safe-area-inset-top));
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+    padding-left: max(20px, env(safe-area-inset-left));
+    overflow-y: auto;
+    background: white;
+    box-shadow: 0 0 60px rgba(33, 28, 58, 0.25);
+    transform: translateX(-102%);
+    visibility: hidden;
+    transition:
+      transform 220ms ease,
+      visibility 0s linear 220ms;
+  }
+
+  body.mnav-open {
+    overflow: hidden; /* halaman di belakang menu tidak ikut tergulung */
+  }
+
+  body.mnav-open .mnav-overlay {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  body.mnav-open .mnav-drawer {
+    transform: none;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  /* Header menempel di atas supaya tombol menu selalu terjangkau saat halaman digulir. */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+@media (min-width: 1024px) {
+  .mnav-bar {
+    display: none;
+  }
+}
+
+.mnav-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mnav-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  padding: 10px 12px;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.mnav-avatar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--color-lilac);
+  color: var(--color-brand);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.mnav-user-text {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.mnav-user-text strong {
+  font-size: 14px;
+}
+
+.mnav-user-text span {
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.mnav-links {
+  display: block;
+}
+
+.mnav-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: auto;
+  border-top: 1px solid var(--color-line);
+  padding-top: 16px;
+}
+
+/* ---------------------------------------------------------------------
+   3. Desktop: sidebar ikut menempel di sisi kiri saat halaman panjang digulir,
+      sehingga "Pusat bantuan / Pengaturan / Keluar" di bagian bawahnya tetap terlihat.
+   --------------------------------------------------------------------- */
+@media (min-width: 1024px) {
+  body > .flex > aside {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: 100vh;
+    overflow-y: auto;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   4. Perangkat layar sentuh: area ketuk minimal sekitar 44px
+   --------------------------------------------------------------------- */
+@media (max-width: 1023.98px) {
+  .icon-button {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (pointer: coarse) {
+  .filter-chip,
+  .req-chip {
+    min-height: 40px;
+  }
+
+  /* Tombol geser (toggle) pengaturan: area ketuk diperluas tanpa mengubah tampilan. */
+  .toggle::before {
+    position: absolute;
+    inset: -10px;
+    content: "";
+  }
+}
+
+/* ---------------------------------------------------------------------
+   5. Ponsel: isian formulir berukuran 16px.
+      Di iPhone, isian dengan huruf < 16px membuat layar otomatis memperbesar saat diketuk.
+      !important diperlukan karena ukuran huruf lama berasal dari class Tailwind (text-sm).
+   --------------------------------------------------------------------- */
+@media (max-width: 767.98px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   6. Ponsel (< 640px)
+   --------------------------------------------------------------------- */
+@media (max-width: 639.98px) {
+  /* Kartu statistik Beranda: 2 kolom (sebelumnya 1 kolom sehingga sangat panjang). */
+  .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .stat-grid > div {
+    padding: 16px;
+  }
+
+  /* Tab "Tulis kebutuhan / Unggah dokumen": satu baris, tidak terpecah dua. */
+  .tab-button {
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .tab-button + .tab-button {
+    margin-left: 16px;
+  }
+
+  /* Area unggah dokumen tidak perlu setinggi di desktop. */
+  .upload-zone {
+    min-height: 220px;
+    padding: 20px 16px;
+    text-align: center;
+  }
+}
+
+/* ---------------------------------------------------------------------
+   7. Tablet (640px - 1023px)
+   --------------------------------------------------------------------- */
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  /* Tombol aksi di samping judul halaman memakan ~265px, sehingga judul panjang
+     (mis. halaman Hasil memakai judul proyek) terpecah menjadi 5 baris.
+     Di tablet, tombol aksi dipindah ke bawah judul seperti di ponsel. */
+  main > div.mb-9 {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Profil: kartu ringkasan di kiri mulai dari lebar tablet (sebelumnya baru dari 1024px). */
+@media (min-width: 768px) {
+  .profile-grid {
+    grid-template-columns: 16rem minmax(0, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .profile-grid {
+    grid-template-columns: 18rem minmax(0, 1fr);
+  }
+}
+
+/* ---------------------------------------------------------------------
+   8. Preferensi pengguna dan cetak
+   --------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .mnav-overlay,
+  .mnav-drawer {
+    transition: none;
+  }
+}
+
+@media print {
+  .mnav-bar,
+  .mnav-overlay,
+  .mnav-drawer {
+    display: none !important;
+  }
+
+  header {
+    position: static;
+  }
+}
