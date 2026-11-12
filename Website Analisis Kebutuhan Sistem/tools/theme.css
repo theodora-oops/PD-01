@@ -1,0 +1,18 @@
+/* Token desain SIKARA (ungu pastel #7464C8 dan #5946A5, font Inter). */
+@theme static {
+  --font-sans: "Inter", sans-serif;
+  --color-brand: #7464c8;
+  --color-brand-dark: #5946a5;
+  --color-brand-soft: #c9bff2;
+  --color-navy: #2a2057;
+  --color-ink: #211c3a;
+  --color-muted: #6a6585;
+  --color-subtle: #9d98b5;
+  --color-line: #e8e5f2;
+  --color-canvas: #f8f7fc;
+  --color-lilac: #efecfb;
+  --color-sky: #d9cffc;
+  --color-success: #23a46f;
+  --shadow-card: 0 18px 50px rgba(60, 40, 120, 0.08);
+  --shadow-logo: 0 8px 22px rgba(116, 100, 200, 0.32);
+}

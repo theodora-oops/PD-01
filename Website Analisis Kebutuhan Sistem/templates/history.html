@@ -1,0 +1,28 @@
+{% from "_macros.html" import icon %}
+{% extends "app.html" %}
+{% set crumb = "Riwayat" %}
+{% set page_title = "Riwayat aktivitas" %}
+{% set page_subtitle = "Jejak unggahan dan analisis yang pernah Anda jalankan." %}
+{% block content %}
+<div class="space-y-8">
+  {% for day, items in activities %}
+  <section>
+    <h2 class="mb-3 text-xs font-bold uppercase tracking-widest text-muted">{{ day }}</h2>
+    <ul class="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-white shadow-card">
+      {% for ic, title, detail, time in items %}
+      <li class="flex items-start gap-4 px-6 py-4 transition hover:bg-canvas">
+        <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-lilac text-brand">{{ icon(ic, "size-5") }}</div>
+        <div class="min-w-0 flex-1">
+          <div class="text-sm font-semibold text-ink">{{ title }}</div>
+          <div class="mt-0.5 text-sm text-muted">{{ detail }}</div>
+        </div>
+        <span class="shrink-0 text-xs text-subtle">{{ time }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% else %}
+  <div class="rounded-3xl border border-dashed border-line bg-white p-12 text-center text-sm text-muted">Belum ada aktivitas.</div>
+  {% endfor %}
+</div>
+{% endblock %}

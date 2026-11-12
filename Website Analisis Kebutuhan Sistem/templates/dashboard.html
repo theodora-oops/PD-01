@@ -1,0 +1,50 @@
+{% from "_macros.html" import icon %}
+{% extends "app.html" %}
+{% set crumb = "Beranda" %}
+{% set page_title = "Halo, " ~ user.first_name %}
+{% set page_subtitle = "Ringkasan aktivitas analisis kebutuhan sistem di SIKARA." %}
+{% block action %}
+<a class="primary-button shrink-0" href="{{ url_for('workspace') }}">
+  {{ icon("plus", "size-5") }}
+  Analisis baru
+</a>
+{% endblock %}
+{% block content %}
+<div class="stat-grid grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+  {% for ic, label, value, note in stats %}
+  <div class="rounded-2xl border border-line bg-white p-5 shadow-card">
+    <div class="flex size-10 items-center justify-center rounded-xl bg-lilac text-brand">{{ icon(ic, "size-5") }}</div>
+    <div class="mt-4 text-3xl font-bold tracking-tight text-ink">{{ value }}</div>
+    <div class="mt-1 text-sm font-medium text-ink">{{ label }}</div>
+    <div class="mt-1 text-xs text-muted">{{ note }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+<section class="mt-8 overflow-hidden rounded-3xl border border-line bg-white shadow-card">
+  <div class="flex items-center justify-between border-b border-line px-6 py-5">
+    <h2 class="text-base font-bold text-ink">Analisis terbaru</h2>
+    <a class="text-xs font-semibold text-brand hover:text-brand-dark" href="{{ url_for('projects') }}">Lihat semua</a>
+  </div>
+  <ul class="divide-y divide-line">
+    {% for r in recent %}
+    <li>
+      {% if r.status == "Selesai" %}
+      <a class="flex items-center gap-4 px-6 py-4 transition hover:bg-canvas" href="{{ url_for('result', proyek=r.id) }}">
+      {% else %}
+      <div class="flex items-center gap-4 px-6 py-4 transition hover:bg-canvas">
+      {% endif %}
+        <div class="flex size-10 shrink-0 items-center justify-center rounded-xl bg-lilac text-brand">{{ icon("document", "size-5") }}</div>
+        <div class="min-w-0 flex-1">
+          <div class="truncate text-sm font-semibold text-ink">{{ r.title }}</div>
+          <div class="mt-0.5 text-xs text-muted">{{ r.source }} · {{ r.date }}</div>
+        </div>
+        <span class="rounded-full px-3 py-1 text-xs font-semibold {{ status_style[r.status] }}">{{ r.status }}</span>
+      {% if r.status == "Selesai" %}</a>{% else %}</div>{% endif %}
+    </li>
+    {% else %}
+    <li class="px-6 py-10 text-center text-sm text-muted">Belum ada analisis. Mulai dari <a class="font-semibold text-brand" href="{{ url_for('workspace') }}">Analisis baru</a>.</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

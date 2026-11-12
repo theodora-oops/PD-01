@@ -1,0 +1,46 @@
+{% from "_macros.html" import icon %}
+{% extends "app.html" %}
+{% set crumb = "Pusat bantuan" %}
+{% set page_title = "Ada yang bisa kami bantu?" %}
+{% set page_subtitle = "Panduan singkat dan jawaban atas pertanyaan yang sering diajukan." %}
+{% block content %}
+<span class="input-shell mb-8">
+  {{ icon("search", "size-5 text-muted") }}
+  <input id="faq-search" class="w-full bg-transparent text-sm text-ink outline-none placeholder:text-subtle" placeholder="Cari pertanyaan atau topik..." />
+</span>
+
+<div class="mb-8 grid gap-4 md:grid-cols-3">
+  {% for ic, title, text in steps %}
+  <div class="rounded-2xl border border-line bg-white p-5 shadow-card">
+    <div class="flex size-10 items-center justify-center rounded-xl bg-lilac text-brand">{{ icon(ic, "size-5") }}</div>
+    <div class="mt-4 text-sm font-bold text-ink">{{ title }}</div>
+    <div class="mt-1 text-sm leading-6 text-muted">{{ text }}</div>
+  </div>
+  {% endfor %}
+</div>
+
+<section class="overflow-hidden rounded-3xl border border-line bg-white shadow-card">
+  <h2 class="border-b border-line px-6 py-5 text-base font-bold text-ink">Pertanyaan umum</h2>
+  <div class="hidden p-8 text-center text-sm text-muted" id="faq-empty">Tidak ada topik yang cocok.</div>
+  <ul class="divide-y divide-line">
+    {% for question, answer in faqs %}
+    <li class="faq-item" data-text="{{ (question ~ answer)|lower }}">
+      <button aria-expanded="{{ 'true' if loop.first else 'false' }}" class="faq-toggle flex w-full items-center justify-between gap-4 px-6 py-4 text-left text-sm font-semibold text-ink transition hover:bg-canvas" type="button">
+        {{ question }}
+        {{ icon("chevron", "faq-chevron size-4 shrink-0 text-muted transition-transform " ~ ("rotate-90" if loop.first else "")) }}
+      </button>
+      <p class="faq-answer px-6 pb-5 text-sm leading-7 text-muted {{ '' if loop.first else 'hidden' }}">{{ answer }}</p>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<div class="mt-6 flex flex-col gap-4 rounded-2xl border border-line bg-lilac/60 p-6 sm:flex-row sm:items-center sm:justify-between">
+  <div>
+    <div class="text-sm font-bold text-ink">Masih butuh bantuan?</div>
+    <div class="mt-1 text-sm text-muted">Tim Penjaminan Mutu Polibatam siap membantu pada jam kerja.</div>
+  </div>
+  <a class="primary-button shrink-0" href="mailto:pm@polibatam.ac.id">Hubungi tim PM</a>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/help.js') }}"></script>{% endblock %}

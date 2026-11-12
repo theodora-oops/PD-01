@@ -1,0 +1,64 @@
+{% from "_macros.html" import icon %}
+{% from "_card.html" import card_open, card_close, field, saved_notice %}
+{% extends "app.html" %}
+{% set crumb = "Pengaturan" %}
+{% set page_title = "Pengaturan" %}
+{% set page_subtitle = "Atur notifikasi, preferensi analisis, dan keamanan akun." %}
+{% block content %}
+{% set select_class = "h-[52px] w-full rounded-[14px] border border-line bg-canvas px-4 text-sm text-ink outline-none focus:border-brand focus:bg-white" %}
+<div class="space-y-6">
+  {{ card_open("Notifikasi") }}
+  <ul class="divide-y divide-line">
+    {% for key, title, desc, on in notif_rows %}
+    <li class="flex items-center justify-between gap-4 py-4 first:pt-0 last:pb-0">
+      <div>
+        <div class="text-sm font-semibold text-ink">{{ title }}</div>
+        <div class="mt-0.5 text-sm text-muted">{{ desc }}</div>
+      </div>
+      <button data-key="{{ key }}" aria-label="{{ title }}" aria-pressed="{{ 'true' if on else 'false' }}" class="toggle relative h-6 w-11 shrink-0 rounded-full transition {{ 'bg-brand' if on else 'bg-line' }}" type="button">
+        <span class="toggle-knob absolute left-0.5 top-0.5 size-5 rounded-full bg-white shadow transition-transform {{ 'translate-x-5' if on else '' }}"></span>
+      </button>
+    </li>
+    {% endfor %}
+  </ul>
+  {{ card_close() }}
+
+  {{ card_open("Preferensi analisis", "Berlaku untuk analisis baru yang Anda jalankan.") }}
+  <div class="grid gap-5 sm:grid-cols-2">
+    <label class="block">
+      <span class="mb-2 block text-sm font-semibold text-ink">Bahasa hasil</span>
+      <select class="{{ select_class }}" id="pref-language">
+        {% for l in languages %}<option {{ "selected" if l == pref_language else "" }}>{{ l }}</option>{% endfor %}
+      </select>
+    </label>
+    <label class="block">
+      <span class="mb-2 block text-sm font-semibold text-ink">Tingkat detail</span>
+      <select class="{{ select_class }}" id="pref-detail">
+        {% for d in details %}<option {{ "selected" if d == pref_detail else "" }}>{{ d }}</option>{% endfor %}
+      </select>
+    </label>
+  </div>
+  <div class="mt-6 flex items-center gap-4">
+    <button class="primary-button" id="save-settings" type="button">Simpan perubahan</button>
+    {{ saved_notice("Pengaturan disimpan", "settings-saved") }}
+    <span class="hidden text-sm font-medium text-red-600" id="settings-error" role="alert"></span>
+  </div>
+  {{ card_close() }}
+
+  {{ card_open("Keamanan", "Gunakan kata sandi yang kuat dan unik.") }}
+  <form class="space-y-5" id="password-form">
+    {{ field("Kata sandi saat ini", "current", type="password") }}
+    <div class="grid gap-5 sm:grid-cols-2">
+      {{ field("Kata sandi baru", "next", type="password") }}
+      {{ field("Konfirmasi kata sandi", "confirm", type="password") }}
+    </div>
+    <div class="flex flex-wrap items-center gap-4">
+      <button class="primary-button disabled:opacity-50" id="password-submit" type="submit" disabled>Perbarui kata sandi</button>
+      {{ saved_notice("Kata sandi berhasil diperbarui.", "password-ok") }}
+      <span class="hidden text-sm font-medium text-red-600" id="password-error" role="alert"></span>
+    </div>
+  </form>
+  {{ card_close() }}
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/settings.js') }}"></script>{% endblock %}
